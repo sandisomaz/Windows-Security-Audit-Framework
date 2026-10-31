@@ -17,11 +17,12 @@
 
 ## 🎥 System Walkthrough & Interactive Demo
 
-Watch the Windows Security Audit Framework execute a diagnostic scan, map findings against CIS/NIST baselines, trigger interactive one-click remediations, and perform snapshot drift analysis:
-
-https://github.com/user-attachments/assets/windows_security_audit_walkthrough.mp4
-
-> *Video file also bundled locally in [`media/windows_security_audit_walkthrough.mp4`](media/windows_security_audit_walkthrough.mp4).*
+<div align="center">
+  <a href="media/windows_security_audit_walkthrough.mp4">
+    <img src="media/demo.gif" alt="Windows Security Audit System Walkthrough Demo" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+  </a>
+  <p><em>Click the preview above or <a href="media/windows_security_audit_walkthrough.mp4">click here to watch the full HD video walkthrough (MP4)</a>.</em></p>
+</div>
 
 ---
 
