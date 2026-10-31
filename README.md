@@ -1,79 +1,117 @@
 # Windows Security Audit Framework
 ### Enterprise-Grade Security Auditing, Forensics, & Threat Hunting for Windows Environments
 
+[![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B%20%7C%207%2B-blue.svg)](https://learn.microsoft.com/powershell/)
+[![Zero External Dependencies](https://img.shields.io/badge/Server-Zero%20Dependencies%20(.NET%20HttpListener)-brightgreen.svg)](#technical-architecture-zero-dependency-api)
+[![Compliance Frameworks](https://img.shields.io/badge/Compliance-CIS%20%7C%20NIST%20%7C%20POPIA-orange.svg)](#compliance-mapping--drift-analysis)
+[![License](https://img.shields.io/badge/Architecture-Proprietary%20Engine-black.svg)](#data-privacy--verification-notice)
+
 ---
 
-> ### Data Privacy & Verification Notice
+> ### 🔒 Data Privacy & Verification Notice
 > **Proprietary Codebase:** The complete source codebase for this project is hosted in a private repository to protect custom threat signatures, forensic modules, and system administration logic. 
 > 
 > **Live Verification:** This repository serves as the public system architecture map and technical documentation. I am highly comfortable performing a live, end-to-end system demonstration and code walk-through during an interview to verify all architectural implementations and logic flows.
 
 ---
 
-## Executive Summary
+## 🎥 System Walkthrough & Interactive Demo
 
-The **Windows Security Audit Framework** is a comprehensive, PowerShell-based security auditing and threat-hunting engine equipped with a modern, responsive Web Dashboard. 
+Watch the Windows Security Audit Framework execute a diagnostic scan, map findings against CIS/NIST baselines, trigger interactive one-click remediations, and perform snapshot drift analysis:
 
-Designed to map live Windows system states to CIS Benchmarks, NIST, and POPIA (Protection of Personal Information Act) requirements, it performs deep forensic analysis and system integrity checks without requiring heavy third-party enterprise agents.
+https://github.com/user-attachments/assets/windows_security_audit_walkthrough.mp4
+
+> *Video file also bundled locally in [`media/windows_security_audit_walkthrough.mp4`](media/windows_security_audit_walkthrough.mp4).*
 
 ---
 
-## Technical Architecture: Zero-Dependency API
+## 🏛️ Executive Summary
 
-A major architectural achievement of this framework is that it runs with **zero external server dependencies** (no IIS, Apache, or Node.js required). It hosts its backend API directly from a live PowerShell session.
+The **Windows Security Audit Framework** is an enterprise-grade, PowerShell-based security auditing and threat-hunting engine equipped with a modern, responsive Web Dashboard. 
 
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                        WEB FRONTEND (HTML/JS)                          │
-│     Built with Tailwind CSS — Responsive Dark/Light Mode adapt         │
-└──────────────────────────────────▲─────────────────────────────────────┘
-                                   │ HTTP / API polling (localhost:8080)
-                                   ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                        BACKEND API (PowerShell)                        │
-│   Hosts a local REST API directly via .NET's [HttpListener] class     │
-│   Streams live audit findings to the frontend via WebSocket-like sync  │
-└──────────────────────────────────▲─────────────────────────────────────┘
-                                   │ Internal Jobs
-                                   ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                       SECURITY AUDIT ENGINE                           │
-│   Asynchronous job-polling scanning WMI, CIM, Registry, and Memory     │
-└────────────────────────────────────────────────────────────────────────┘
+Designed to map live Windows workstation and server states directly to **CIS Benchmarks**, **NIST Special Publication 800-53**, and **POPIA Section 19** security safeguarding mandates, it performs deep forensic triage and system integrity checks without requiring heavy third-party agent installations or external cloud infrastructure.
 
- Core Diagnostic Capabilities
+---
 
-  - Deep Process Triage: Detects process injection, unsigned binaries running in
-    memory, and fileless malware by scanning heuristic checks against CIM/WMI
-    namespaces.
-  - Persistence Hunting: Scans WMI subscriptions, Registry Autoruns, and Windows
-    Scheduled Tasks for unauthorized backdoors.
-  - Forensic Analysis: Audits browser extensions, local HOSTS file integrity,
-    and recent system execution timelines.
-  - Crypto Miner Detection: Identifies abnormal CPU usage patterns and known
-    mining signatures.
-  - System Hardening Audit: Inspects User Account Control (UAC), Secure Boot,
-    TPM status, and Windows Defender active configurations against enterprise
-    baselines.
+## ⚙️ Technical Architecture: Zero-Dependency API
 
- Scan Profiles & Execution Modes
+A key engineering breakthrough of this framework is that it operates with **zero external web server dependencies** (no IIS, Apache, Node.js, or Python installations required on the target machine). It hosts its backend REST API directly from a live PowerShell session leveraging native .NET runtime primitives.
 
-The framework supports multiple tiered scanning modes depending on the incident
-response requirement:
+```mermaid
+flowchart TD
+    subgraph Frontend["Modern Dashboard UI (Tailwind CSS)"]
+        UI[Interactive Web Console]
+        Drift[Snapshot Drift Comparator]
+        Remediation[One-Click Remediation Panel]
+    end
 
-| Mode           | Duration  | Description                                                                     |
-| -------------- | --------- | ------------------------------------------------------------------------------- |
-| **⚡ Quick**    | 2-3 min   | Essential checks: Memory integrity, Disk Health, Critical System Files.         |
-| **📋 Standard** | 5-7 min   | Core checks + full Persistence Hunting (Autoruns, WMI).                         |
-| **🔍 Deep**     | 10-15 min | Comprehensive audit: Network, Firewall, Defender, and OS Hardening.             |
-| **🔬 Forensic** | 20+ min   | Full investigation: Timeline analysis, verbose system logs, and threat hunting. |
+    subgraph Backend["Zero-Dependency Native Backend (.NET / PowerShell)"]
+        Listener[System.Net.HttpListener - localhost:8080]
+        JobEngine[Asynchronous PowerShell Job Manager]
+        Storage[JSON & Event Stream Serializer]
+    end
 
-🛠️ Technology Stack & Requirements
+    subgraph OS["Windows Operating System Subsystems"]
+        CIM[WMI / CIM Namespaces]
+        Reg[Registry Autoruns & Policies]
+        SecLog[Security Event Log & Audit Policies]
+        Defender[Windows Defender / ASR Rules]
+    end
 
-  - Backend Engine: Windows PowerShell 5.1+ (Leveraging .NET Framework)
-  - Frontend UI: HTML5, modern JavaScript, Tailwind CSS
-  - Reporting: Auto-generates beautifully formatted HTML, JSON (for machine
-    readability/automation), and CSV reports.
-  - OS Support: Windows 10 & Windows 11 environments.
+    UI -->|REST API / State Polling| Listener
+    Remediation -->|Remediation Dispatch| Listener
+    Listener --> JobEngine
+    JobEngine --> CIM
+    JobEngine --> Reg
+    JobEngine --> SecLog
+    JobEngine --> Defender
+    JobEngine --> Storage
+    Storage --> Listener
+```
 
-Architected and maintained by Sandiso Mazibuko.
+---
+
+## 🔍 Core Diagnostic Capabilities
+
+- **Deep Process Triage:** Detects process injection, unsigned binaries executing from user-writable directories (`AppData`, `Temp`), and fileless malware by scanning heuristic checks against CIM/WMI namespaces.
+- **Persistence Hunting:** Scans WMI event consumers, Registry Run/RunOnce keys, Startup folders, and Windows Scheduled Tasks for unauthorized backdoors.
+- **Forensic Timeline Analysis:** Audits browser extensions, local `HOSTS` file modifications, PowerShell execution logs, and recent system execution timelines.
+- **Crypto Miner Detection:** Identifies abnormal background CPU consumption patterns, masked processes, and known mining signature hashes.
+- **System Hardening Audit:** Inspects User Account Control (UAC), Secure Boot, TPM status, BitLocker encryption, Attack Surface Reduction (ASR) rules, and Windows Defender active configurations against enterprise baselines.
+
+---
+
+## 📊 Scan Profiles & Execution Modes
+
+| Profile | Typical Duration | Scope & Focus Area |
+| :--- | :--- | :--- |
+| **⚡ Quick** | 1–2 min | Memory integrity, active process triage, critical system files, and Defender state. |
+| **📋 Standard** | 4–6 min | Core checks + full Persistence Hunting (Autoruns, Scheduled Tasks, WMI subscriptions). |
+| **🔍 Deep** | 8–12 min | Comprehensive audit: Network listeners, firewall state, BitLocker, and OS hardening. |
+| **🔬 Forensic** | 15+ min | Exhaustive investigation: Timeline analysis, verbose event logs, and threat hunting. |
+
+---
+
+## 🛡️ Compliance Mapping & Drift Analysis
+
+### Standard Framework Alignments
+Every finding is tagged with specific compliance cross-references:
+- **CIS Controls v8:** Workstation baseline configuration, logging, and account control.
+- **NIST CSF / SP 800-53:** Access control (AC), system and communications protection (SC).
+- **POPIA Section 19:** Mandatory security measures on integrity and confidentiality of personal data.
+
+### Baseline Snapshot Drift Comparator
+Allows security analysts to capture a baseline snapshot of a clean system and compare subsequent scans to immediately pinpoint newly introduced registry persistence, modified services, or disabled security controls.
+
+---
+
+## 🛠️ Technology Stack & Requirements
+
+- **Backend Engine:** Windows PowerShell 5.1+ / PowerShell 7+ (leveraging native .NET Framework `System.Net.HttpListener`).
+- **Frontend UI:** HTML5, modern vanilla JavaScript, Tailwind CSS (light/dark adaptive styling).
+- **Reporting Engine:** Automatic generation of responsive HTML reports, machine-readable JSON schemas (for SIEM ingestion), and CSV summaries.
+- **Target OS:** Windows 10 & Windows 11 (Home, Pro, Enterprise, and Education editions).
+
+---
+
+Architected and maintained by **Sandiso Mazibuko**.
